@@ -23,26 +23,26 @@
 #define CLOUD_COUNT 3
 #define PLATFORMER_COUNT 6
 
-Rect Rct_Background = {0,WIDTH,48,HEIGHT},Rct_Ground ={0,WIDTH,0,48};
+Rect Rct_Background = {0,720,48,384},Rct_Ground ={0,720,0,48};
 Image Img_Background,Img_Ground;
 //xu ly thay doi cua cua so, khi goi lai thi ve lai hoan toan
 void Display(){
 	glClear(GL_COLOR_BUFFER_BIT);
 	glLoadIdentity();//reset he toa do
 
-    Map_Texture($Img_Background);
+    Map_Texture(&Img_Background);
     Draw_Rect(&Rct_Background);
-    Map_Texture($Img_Ground);
+    Map_Texture(&Img_Ground);
     Draw_Rect(&Rct_Ground);
 
 	glutSwapBuffers();//
 }
 
 void Init_Game(){
-    Load_Texture_Swap($Img_Background,"Image/Background.png");
-    Zoom_Image($Img_Background,SCALE);
-    Load_Texture_Swap($Img_Ground,"Image/Ground.png");
-    Zoom_Image($Img_Ground,SCALE);
+    Load_Texture_Swap(&Img_Background,"./Images/bg3.png");
+    Zoom_Image(&Img_Background,SCALE);
+    Load_Texture_Swap(&Img_Ground,"./Images/Ground.png");
+    Zoom_Image(&Img_Ground,3);
 }
 
 void Init_GL() {
@@ -64,7 +64,7 @@ void Init_GL() {
     Init_Game();
 }
 void Timer(int value){
-    printf("Hello");
+//    printf("Hello");
     glutPostRedisplay();
     glutTimerFunc(INTERVAL,Timer,0);
 }
