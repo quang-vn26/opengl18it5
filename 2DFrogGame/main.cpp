@@ -38,11 +38,12 @@ void Init_GL() {
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-//    glutIgnoreKeyRepeat(GL_TRUE);
     glEnable(GL_TEXTURE_2D);
-    // adfsad
-
-//    Game_State = GAME_PLAY;
+}
+void Timer(int value){
+    printf("Hello");
+    glutPostRedisplay();
+    glutTimerFunc(INTERVAL,Timer,0);
 }
 int main(int argc, char **argv) {
     glutInit(&argc, argv);
@@ -54,8 +55,11 @@ int main(int argc, char **argv) {
 	glutInitWindowPosition(POS_X,POS_Y);
 	glutInitWindowSize(WIDTH,HEIGHT);
 	glutCreateWindow("FROG 2D Game");
+
 	Init_GL();
 	glutDisplayFunc(Display);
+    glutTimerFunc(0,Timer,0);
+
 	glutMainLoop();
 	return 0;
 }
