@@ -29,6 +29,11 @@ Image Img_Background,Img_Ground;
 //mang de thiet lap toa do
 int Map[MAX_X][MAX_Y];
 
+float Gravity = -1.2f;
+
+//dinh nghia duong bien
+float BOUNDARY_LEFT = 30.0f,BOUNDARY_RIGHT =690.0f;
+
 class c_Platformer {
 public:
     static Image Img_Save;
@@ -148,6 +153,50 @@ class c_Frog {
             Draw_Rect(&Rct);
         }
 
+        void Jump(){
+            if(!Is_Jumping){
+                Is_Jumping = true;
+                Anim =1;
+                Update_Image();
+            }
+        }
+
+        void Key_Down(){
+            Is_Jump_pressed = true;
+        }
+        void Key_Up(){
+            Is_Jump_pressed = false;
+            vx= 10.0f;
+            vy = 10.0f;
+            Jump();
+        }
+        void Update() {
+            if (Is_Jumping) {
+                float y_old = y;
+                x+=vx;
+                y+=vy;
+                vy+=Gravity;
+                if(vy<-24.0f)
+                    vy=-24.0f;
+                //khi roi xuong
+                if(vy<=0.0f){
+                    int col1 =(x-9.0f)/CELL_SIZE;
+                    int col2 = (x+9.0f)/CELL_SIZE;
+                    int row_old = y_old/CELL_SIZE;
+                    int row = y/CELL_SIZE;
+                    if(!Map[row_old][col1] && !Map[row_old][col2] && (Map[row][col1] || Map[row][col2])){
+                        Is_Jumping = false;
+                        y=(row+1)*CELL_SIZE;
+                        vx = 0.0f;
+                        vy=0.0f;
+                        Anim =0;
+                        Update_Image();
+                    }
+                } 
+                Update_Rect();                   
+            }
+        }
+
         static void Load_Image(){
             Image Img;
             Load_Texture(&Img, "Images/Frogs.png");
@@ -252,8 +301,36 @@ void Timer(int value){
 //    printf("Hello");
     for(int i=0;i<CLOUD_COUNT; i++)
         Clouds[i].Update();
+
+    Frogs[0].Update();
+    Frogs[1].Update();
+
     glutPostRedisplay();
     glutTimerFunc(INTERVAL,Timer,0);
+}
+void Keyboard_Down(GLubyte key,int x,int y){
+    switch(key){
+        case 32: 
+            printf("down 32");
+            Frogs[0].Key_Down();
+            break;
+        case 13:
+            printf("down 13");
+            Frogs[0].Key_Down();
+            break;            
+    }
+}
+void Keyboard_Up(GLubyte key,int x,int y){
+    switch(key){
+        case 32: 
+            printf("up 32");
+            Frogs[0].Key_Up();
+            break;
+        case 13:
+            printf("up 13");
+            Frogs[1].Key_Up();
+            break;            
+    }
 }
 int main(int argc, char **argv) {
     glutInit(&argc, argv);
@@ -269,6 +346,9 @@ int main(int argc, char **argv) {
 	Init_GL();
 	glutDisplayFunc(Display);
     glutTimerFunc(0,Timer,0);
+    glutKeyboardFunc(Keyboard_Down);
+    glutKeyboardUpFunc(Keyboard_Up);
+
 
 	glutMainLoop();
 	return 0;
