@@ -193,10 +193,19 @@ class c_Frog {
                         Update_Image();
                     }
                 } 
+
+                if(Check_Boundnary[Drt](x)){
+                    Drt = 1-Drt;
+                    vx = -vx;
+                    Update_Image();
+                }
                 Update_Rect();                   
             }
         }
-
+        //tao duong bien
+        static bool Check_Boundnary_Left(float x){ return x < BOUNDARY_LEFT;}
+        static bool Check_Boundnary_Right(float x){ return x > BOUNDARY_RIGHT;}
+        static bool (*Check_Boundnary[2])(float x);
         static void Load_Image(){
             Image Img;
             Load_Texture(&Img, "Images/Frogs.png");
@@ -223,6 +232,8 @@ class c_Frog {
 Image c_Frog::Img_Save[2][2][2];
 float c_Frog::Map_Offset[2]={-1.0f,1.0f};
 float c_Frog::Map_Base_Angle[2]={160.0f,20.0f};
+bool (*c_Frog::Check_Boundnary[2])(float x) = {c_Frog::Check_Boundnary_Left,c_Frog::Check_Boundnary_Right};
+
 c_Frog Frogs[2];
 //xu ly thay doi cua cua so, khi goi lai thi ve lai hoan toan
 void Display(){
