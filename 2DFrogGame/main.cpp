@@ -1,14 +1,13 @@
+#define GLUT_DISABLE_ATEXIT_HACK
 #include <math.h>//ap dung 1 so thuat toan ...
-
 #include <GL/glut.h>
-#include <iostream>
+
 #include <vector>
 //them mot so thu vien vao
 #include "../Library/Loadpng.h"
 #include "../Library/process_image.h"
 #include "../Library/gl_texture.h"
 
-//xac dinh kich thuoc cua so
 #define WIDTH 720
 #define HEIGHT 384
 //fps dat 50 goi lai ham Display() moi 15s
@@ -33,12 +32,12 @@ int Map[MAX_X][MAX_Y];
 class c_Platformer {
 public:
     static Image Img_Save;
-    Rect Rct;
-    Image *Img;
  	static void Load_Image() {
         Load_Texture_Swap(&Img_Save, "Images/Platformer.png");
         Zoom_Image(&Img_Save,SCALE);
     }
+    Rect Rct;
+    Image *Img;
     void Init(int _x, int _y) {
         Map[_y][_x] = Map[_y][_x + 1] = Map[_y][_x + 2] = Map[_y][_x + 3] = 1;
         Img = &Img_Save;
@@ -62,12 +61,13 @@ c_Platformer Platformers[PLATFORMER_COUNT];
 class c_Cloud {
 public:
     static Image Img_Save;
-
+    static void Load_Image() {
+        Load_Texture_Swap(&Img_Save, "Images/Cloud.png");
+        Zoom_Image(&Img_Save,SCALE);
+    }
     Rect Rct;
     Image *Img;
-
     float x, y;
-
     void Init(float _x, float _y) {
         Img = &Img_Save;
         x = _x;
@@ -95,187 +95,86 @@ public:
         Update_Rect();
     }
 
-    static void Load_Image() {
-        Load_Texture_Swap(&Img_Save, "Images/Cloud.png");
-        Zoom_Image(&Img_Save,SCALE);
-    }
 };
 Image c_Cloud::Img_Save;
 c_Cloud Clouds[CLOUD_COUNT];
 
-//-------------Frog-----------------
-// class c_Frog {
-//     public:
-//         static Image Img_Save[2][2][2];
-//         static float Map_Offset[2];
-//         static float Map_Base_Angle[2];//goc co ban
-
-//         float x, y, vx, vy;
-//         Rect Rct;
-//         Image *Img;
-        
-//         int Player;
-//         int Drt, Anim;//dang ngoi hay nhay
-//         int Prepare_Stt;//trang thai 
-//         bool Is_Jumping;//con ech dang nhay hay khong
-//         bool Is_Jump_pressed;
-//         float Angle;//goc tang dan hay giam 0 hay 1
-//         int Angle_Drt;//Huong cua goc
-//         int Score;//
-
-//         void Init(int _Player) {
-//             Player = _Player;
-//             Drt = 1 - Player;
-//             Anim = 0;//dang ngoi
-//             float Offset = 11.0f * CELL_SIZE * (Player == 0 ? -1 : 1);//nguoi choi khong thi ...
-//             x = WIDTH /2 + Offset;
-//             y = CELL_SIZE * 2.0f;
-//             Prepare_Stt = 0;
-//             Is_Jumping = false;
-//             Is_Jump_pressed = false;
-//             Update_Image();
-//             Update_Rect();
-//         }
-//         void Update_Image() {
-//             Img = &Img_Save[Player][Drt][Anim];
-//         }
-
-//         void Update_Rect() {
-//             Rct.Left = x - Img->w / 2;
-//             Rct.Right = Rct.Left + Img->w;
-//             Rct.Bottom = y;
-//             Rct.Top = Rct.Bottom + Img->h;
-//         }
-
-//         void Draw() {
-//             Map_Texture(Img);
-//             Draw_Rect(&Rct);
-//         }
-//         void Prepare_Start() {
-//             Prepare_Stt = 1;
-//             Angle = 20.0f;
-//             Angle_Drt = 1;
-//         }
-//         void Prepare_End() {
-//             Prepare_Stt = 2;
-//         }
-//         //TODO: Load image kha phuc tap
-//         static void Load_Image(){
-//             Image img;
-//             Load_Texture_Swap(&Img, "Images/Frogs.png");
-//             Crop_Image(&Img,&Img_Save[0][1][0],0,0,18,16);//nguoi choi 1,1 nhin sang phai,0: ngoi ,
-//             Crop_Image(&Img, &Img_Save[0][1][1], 0, 16, 18, 16);
-//             Crop_Image(&Img, &Img_Save[1][1][0], 18, 0, 18, 16);
-//             Crop_Image(&Img, &Img_Save[1][1][1], 18, 16, 18, 16);
-//             Swap_Image(Img_Save[0][1][0].img, 18, 16);//opengl xet toa do tu duoi len tren nen phai dung ham dao lai
-//             Swap_Image(Img_Save[0][1][1].img, 18, 16);
-//             Swap_Image(Img_Save[1][1][0].img, 18, 16);
-//             Swap_Image(Img_Save[1][1][1].img, 18, 16);
-//             Zoom_Image(&Img_Save[0][1][0],SCALE);
-//             Zoom_Image(&Img_Save[0][1][1],SCALE);
-//             Zoom_Image(&Img_Save[1][1][0],SCALE);
-//             Zoom_Image(&Img_Save[1][1][1],SCALE);
-//             Flip_Horizontal(&Img_Save[0][1][0], &Img_Save[0][0][0]);
-//             Flip_Horizontal(&Img_Save[0][1][1], &Img_Save[0][0][1]);
-//             Flip_Horizontal(&Img_Save[1][1][0], &Img_Save[1][0][0]);
-//             Flip_Horizontal(&Img_Save[1][1][1], &Img_Save[1][0][1]);
-//             Delete_Image(&Img);//giai phong bo nho
-//         }
-
-// };
-
 class c_Frog {
-public:
-    static Image Img_Save[2][2][2]; // Player color, Direction, Animation
+    public:
+        static Image Img_Save[2][2][2];// nguoi choi, huong,hanh dong
+        static float Map_Offset[2];
+        static float Map_Base_Angle[2];//goc co ban de nhay 
 
-    float x, y, vx, vy;
-    Rect Rct;
-    Image *Img;
-    int Player;
-    int Drt, Anim;
-    int Prepare_Stt;
-    bool Is_Jumping;
-    float Angle;
-    int Angle_Drt;
+        Rect Rct;
+        Image *Img;
 
-    void Init(int _Player) {
-        Player = _Player;
-        Drt = 1 - Player;
-        Anim = 0;
-        float Offset = 11.0f * CELL_SIZE * (Player == 0 ? -1 : 1);
-        x = WIDTH / SCALE / 2 + Offset;
-        y = CELL_SIZE * 2.0f;
-        Prepare_Stt = 0;
-        Is_Jumping = false;
-        Update_Image();
-        Update_Rect();
-    }
+        float x, y, vx, vy;//vi tri van toc
+        int Player;
+        int Drt, Anim;//dang ngoi hay nhay
+        int Prepare_Stt;//trang thai 
+        bool Is_Jumping;//con ech dang nhay hay khong
+        bool Is_Jump_pressed;
+        float Angle;//goc tang dan hay giam 0 hay 1, luu goc
+        int Angle_Drt;//Huong cua goc
+        int Score;//
 
-    void Update_Image() {
-        Img = &Img_Save[Player][Drt][Anim];
-    }
-
-    void Update_Rect() {
-        Rct.Left = x - Img->w / 2;
-        Rct.Right = Rct.Left + Img->w;
-        Rct.Bottom = y;
-        Rct.Top = Rct.Bottom + Img->h;
-    }
-
-    void Draw() {
-        Map_Texture(Img);
-        Draw_Rect(&Rct);
-    }
-
-    void Prepare_Start() {
-        Prepare_Stt = 1;
-        Angle = 20.0f;
-        Angle_Drt = 1;
-    }
-
-    void Prepare_End() {
-        Prepare_Stt = 2;
-    }
-
-    void Jump(float _vx, float _vy) {
-        if (!Is_Jumping) {
-            if (Drt == 0)
-                _vx = -4.0f;
-            else
-                _vx = 4.0f;
-            Is_Jumping = true;
-            vx = _vx;
-            vy = _vy;
-            Anim = 1;
+        void Init(int _Player) {
+            Player = _Player;
+            Drt = 1 - Player;
+            Anim = 0;//dang ngoi
+            float Offset = 11.0f * CELL_SIZE * (Player == 0 ? -1 : 1);//nguoi choi khong thi ...
+            x = WIDTH /2 + Offset;
+            y = CELL_SIZE * 2.0f;
+            Prepare_Stt = 0;
+            Is_Jumping = false;
+            Is_Jump_pressed = false;
             Update_Image();
+            Update_Rect();
         }
-    }
 
-    
+        void Update_Image() {
+            Img = &Img_Save[Player][Drt][Anim];
+        }
 
-    static void Load_Image() {
-        Image Img;
-        Load_Texture(&Img, "Images/Frog.png");
-        Crop_Image(&Img, &Img_Save[0][1][0], 0, 0, 18, 16);
-        Crop_Image(&Img, &Img_Save[0][1][1], 0, 16, 18, 16);
-        Crop_Image(&Img, &Img_Save[1][1][0], 18, 0, 18, 16);
-        Crop_Image(&Img, &Img_Save[1][1][1], 18, 16, 18, 16);
-        Swap_Image(Img_Save[0][1][0].img, 18, 16);
-        Swap_Image(Img_Save[0][1][1].img, 18, 16);
-        Swap_Image(Img_Save[1][1][0].img, 18, 16);
-        Swap_Image(Img_Save[1][1][1].img, 18, 16);
-        Flip_Horizontal(&Img_Save[0][1][0], &Img_Save[0][0][0]);
-        Flip_Horizontal(&Img_Save[0][1][1], &Img_Save[0][0][1]);
-        Flip_Horizontal(&Img_Save[1][1][0], &Img_Save[1][0][0]);
-        Flip_Horizontal(&Img_Save[1][1][1], &Img_Save[1][0][1]);
-        Delete_Image(&Img);
-    }
+        void Update_Rect() {
+            Rct.Left = x - Img->w / 2;
+            Rct.Right = Rct.Left + Img->w;
+            Rct.Bottom = y;
+            Rct.Top = Rct.Bottom + Img->h;
+        }
+
+        void Draw() {
+            Map_Texture(Img);
+            Draw_Rect(&Rct);
+        }
+
+        static void Load_Image(){
+            Image Img;
+            Load_Texture(&Img, "Images/Frogs.png");
+            Crop_Image(&Img,&Img_Save[0][1][0],0,0,18,16);//nguoi choi 1,1 nhin sang phai,0: ngoi ,
+            Crop_Image(&Img, &Img_Save[0][1][1], 0, 16, 18, 16);
+            Crop_Image(&Img, &Img_Save[1][1][0], 18, 0, 18, 16);
+            Crop_Image(&Img, &Img_Save[1][1][1], 18, 16, 18, 16);
+            Swap_Image(Img_Save[0][1][0].img, 18, 16);//opengl xet toa do tu duoi len tren nen phai dung ham dao lai
+            Swap_Image(Img_Save[0][1][1].img, 18, 16);
+            Swap_Image(Img_Save[1][1][0].img, 18, 16);
+            Swap_Image(Img_Save[1][1][1].img, 18, 16);
+            Zoom_Image(&Img_Save[0][1][0],SCALE);
+            Zoom_Image(&Img_Save[0][1][1],SCALE);
+            Zoom_Image(&Img_Save[1][1][0],SCALE);
+            Zoom_Image(&Img_Save[1][1][1],SCALE);
+            Flip_Horizontal(&Img_Save[0][1][0], &Img_Save[0][0][0]);
+            Flip_Horizontal(&Img_Save[0][1][1], &Img_Save[0][0][1]);
+            Flip_Horizontal(&Img_Save[1][1][0], &Img_Save[1][0][0]);
+            Flip_Horizontal(&Img_Save[1][1][1], &Img_Save[1][0][1]);
+            Delete_Image(&Img);//giai phong bo nho
+        }
+
 };
 Image c_Frog::Img_Save[2][2][2];
-//float c_Frog::Map_Offset[2]={-1.0f,1.0f};//
-//float c_Frog::Map_Base_Angle[2]={160.0f,20.0f};//nhin sang trai goc 160
+float c_Frog::Map_Offset[2]={-1.0f,1.0f};
+float c_Frog::Map_Base_Angle[2]={160.0f,20.0f};
 c_Frog Frogs[2];
-
 //xu ly thay doi cua cua so, khi goi lai thi ve lai hoan toan
 void Display(){
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -339,7 +238,7 @@ void Init_GL() {
     glViewport(0, 0, WIDTH, HEIGHT);
     gluOrtho2D(0, WIDTH, 0, HEIGHT);
     glMatrixMode(GL_MODELVIEW);
-    glEnable(GL_BLEND);
+    glEnable(GL_BLEND);//ho tro hinh anh trong suot
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_LINE_SMOOTH);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -347,7 +246,6 @@ void Init_GL() {
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glEnable(GL_TEXTURE_2D);
- 
     Init_Game();
 }
 void Timer(int value){
