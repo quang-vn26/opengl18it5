@@ -100,93 +100,180 @@ public:
         Zoom_Image(&Img_Save,SCALE);
     }
 };
-
 Image c_Cloud::Img_Save;
 c_Cloud Clouds[CLOUD_COUNT];
 
+//-------------Frog-----------------
+// class c_Frog {
+//     public:
+//         static Image Img_Save[2][2][2];
+//         static float Map_Offset[2];
+//         static float Map_Base_Angle[2];//goc co ban
+
+//         float x, y, vx, vy;
+//         Rect Rct;
+//         Image *Img;
+        
+//         int Player;
+//         int Drt, Anim;//dang ngoi hay nhay
+//         int Prepare_Stt;//trang thai 
+//         bool Is_Jumping;//con ech dang nhay hay khong
+//         bool Is_Jump_pressed;
+//         float Angle;//goc tang dan hay giam 0 hay 1
+//         int Angle_Drt;//Huong cua goc
+//         int Score;//
+
+//         void Init(int _Player) {
+//             Player = _Player;
+//             Drt = 1 - Player;
+//             Anim = 0;//dang ngoi
+//             float Offset = 11.0f * CELL_SIZE * (Player == 0 ? -1 : 1);//nguoi choi khong thi ...
+//             x = WIDTH /2 + Offset;
+//             y = CELL_SIZE * 2.0f;
+//             Prepare_Stt = 0;
+//             Is_Jumping = false;
+//             Is_Jump_pressed = false;
+//             Update_Image();
+//             Update_Rect();
+//         }
+//         void Update_Image() {
+//             Img = &Img_Save[Player][Drt][Anim];
+//         }
+
+//         void Update_Rect() {
+//             Rct.Left = x - Img->w / 2;
+//             Rct.Right = Rct.Left + Img->w;
+//             Rct.Bottom = y;
+//             Rct.Top = Rct.Bottom + Img->h;
+//         }
+
+//         void Draw() {
+//             Map_Texture(Img);
+//             Draw_Rect(&Rct);
+//         }
+//         void Prepare_Start() {
+//             Prepare_Stt = 1;
+//             Angle = 20.0f;
+//             Angle_Drt = 1;
+//         }
+//         void Prepare_End() {
+//             Prepare_Stt = 2;
+//         }
+//         //TODO: Load image kha phuc tap
+//         static void Load_Image(){
+//             Image img;
+//             Load_Texture_Swap(&Img, "Images/Frogs.png");
+//             Crop_Image(&Img,&Img_Save[0][1][0],0,0,18,16);//nguoi choi 1,1 nhin sang phai,0: ngoi ,
+//             Crop_Image(&Img, &Img_Save[0][1][1], 0, 16, 18, 16);
+//             Crop_Image(&Img, &Img_Save[1][1][0], 18, 0, 18, 16);
+//             Crop_Image(&Img, &Img_Save[1][1][1], 18, 16, 18, 16);
+//             Swap_Image(Img_Save[0][1][0].img, 18, 16);//opengl xet toa do tu duoi len tren nen phai dung ham dao lai
+//             Swap_Image(Img_Save[0][1][1].img, 18, 16);
+//             Swap_Image(Img_Save[1][1][0].img, 18, 16);
+//             Swap_Image(Img_Save[1][1][1].img, 18, 16);
+//             Zoom_Image(&Img_Save[0][1][0],SCALE);
+//             Zoom_Image(&Img_Save[0][1][1],SCALE);
+//             Zoom_Image(&Img_Save[1][1][0],SCALE);
+//             Zoom_Image(&Img_Save[1][1][1],SCALE);
+//             Flip_Horizontal(&Img_Save[0][1][0], &Img_Save[0][0][0]);
+//             Flip_Horizontal(&Img_Save[0][1][1], &Img_Save[0][0][1]);
+//             Flip_Horizontal(&Img_Save[1][1][0], &Img_Save[1][0][0]);
+//             Flip_Horizontal(&Img_Save[1][1][1], &Img_Save[1][0][1]);
+//             Delete_Image(&Img);//giai phong bo nho
+//         }
+
+// };
+
 class c_Frog {
-    public:
-        static Image Img_Save[2][2][2]; // Player color, Direction, Animation
-        static float Map_Offset[2];
-        static float Map_Base_Angle[2];//goc co ban
+public:
+    static Image Img_Save[2][2][2]; // Player color, Direction, Animation
 
-        float x, y, vx, vy;
-        Rect Rct;
-        Image *Img;
+    float x, y, vx, vy;
+    Rect Rct;
+    Image *Img;
+    int Player;
+    int Drt, Anim;
+    int Prepare_Stt;
+    bool Is_Jumping;
+    float Angle;
+    int Angle_Drt;
 
-//        float x, y, vx, vy;//van toc
-        int Player;
-        int Drt, Anim;//dang ngoi hay nhay
-        int Prepare_Stt;//trang thai 
-        bool Is_Jumping;//con ech dang nhay hay khong
-        bool Is_Jump_pressed;
-        float Angle;//goc tang dan hay giam 0 hay 1
-        int Angle_Drt;//Huong cua goc
-        int Score;//
+    void Init(int _Player) {
+        Player = _Player;
+        Drt = 1 - Player;
+        Anim = 0;
+        float Offset = 11.0f * CELL_SIZE * (Player == 0 ? -1 : 1);
+        x = WIDTH / SCALE / 2 + Offset;
+        y = CELL_SIZE * 2.0f;
+        Prepare_Stt = 0;
+        Is_Jumping = false;
+        Update_Image();
+        Update_Rect();
+    }
 
-        void Init(int _Player) {
-            Player = _Player;
-            Drt = 1 - Player;
-            Anim = 0;//dang ngoi
-            float Offset = 11.0f * CELL_SIZE * (Player == 0 ? -1 : 1);//nguoi choi khong thi ...
-            x = WIDTH /2 + Offset;
-            y = CELL_SIZE * 2.0f;
-            Prepare_Stt = 0;
-            Is_Jumping = false;
-            Is_Jump_pressed = false;
+    void Update_Image() {
+        Img = &Img_Save[Player][Drt][Anim];
+    }
+
+    void Update_Rect() {
+        Rct.Left = x - Img->w / 2;
+        Rct.Right = Rct.Left + Img->w;
+        Rct.Bottom = y;
+        Rct.Top = Rct.Bottom + Img->h;
+    }
+
+    void Draw() {
+        Map_Texture(Img);
+        Draw_Rect(&Rct);
+    }
+
+    void Prepare_Start() {
+        Prepare_Stt = 1;
+        Angle = 20.0f;
+        Angle_Drt = 1;
+    }
+
+    void Prepare_End() {
+        Prepare_Stt = 2;
+    }
+
+    void Jump(float _vx, float _vy) {
+        if (!Is_Jumping) {
+            if (Drt == 0)
+                _vx = -4.0f;
+            else
+                _vx = 4.0f;
+            Is_Jumping = true;
+            vx = _vx;
+            vy = _vy;
+            Anim = 1;
             Update_Image();
-            Update_Rect();
         }
-        void Update_Image() {
-            Img = &Img_Save[Player][Drt][Anim];
-        }
+    }
 
-        void Update_Rect() {
-            Rct.Left = x - Img->w / 2;
-            Rct.Right = Rct.Left + Img->w;
-            Rct.Bottom = y;
-            Rct.Top = Rct.Bottom + Img->h;
-        }
+    
 
-        void Draw() {
-            Map_Texture(Img);
-            Draw_Rect(&Rct);
-        }
-        void Prepare_Start() {
-            Prepare_Stt = 1;
-            Angle = 20.0f;
-            Angle_Drt = 1;
-        }
-        void Prepare_End() {
-            Prepare_Stt = 2;
-        }
-        //TODO: Load image kha phuc tap
-        static void Load_Image(){
-            Image img;
-            Load_Texture(&Img,"Images/Frogs.png");
-            Crop_Image(&Img,&Img_Save[0][1][0],0,0,18,16);//nguoi choi 1,1 nhin sang phai,0: ngoi ,
-            Crop_Image(&Img, &Img_Save[0][1][1], 0, 16, 18, 16);
-            Crop_Image(&Img, &Img_Save[1][1][0], 18, 0, 18, 16);
-            Crop_Image(&Img, &Img_Save[1][1][1], 18, 16, 18, 16);
-            Swap_Image(Img_Save[0][1][0].img, 18, 16);//opengl xet toa do tu duoi len tren nen phai dung ham dao lai
-            Swap_Image(Img_Save[0][1][1].img, 18, 16);
-            Swap_Image(Img_Save[1][1][0].img, 18, 16);
-            Swap_Image(Img_Save[1][1][1].img, 18, 16);
-            Zoom_Image(&Img_Save[0][1][0],SCALE);
-            Zoom_Image(&Img_Save[0][1][1],SCALE);
-            Zoom_Image(&Img_Save[1][1][0],SCALE);
-            Zoom_Image(&Img_Save[1][1][1],SCALE);
-            Flip_Horizontal(&Img_Save[0][1][0], &Img_Save[0][0][0]);
-            Flip_Horizontal(&Img_Save[0][1][1], &Img_Save[0][0][1]);
-            Flip_Horizontal(&Img_Save[1][1][0], &Img_Save[1][0][0]);
-            Flip_Horizontal(&Img_Save[1][1][1], &Img_Save[1][0][1]);
-            Delete_Image(&Img);//giai phong bo nho
-        }
-
+    static void Load_Image() {
+        Image Img;
+        Load_Texture(&Img, "Images/Frog.png");
+        Crop_Image(&Img, &Img_Save[0][1][0], 0, 0, 18, 16);
+        Crop_Image(&Img, &Img_Save[0][1][1], 0, 16, 18, 16);
+        Crop_Image(&Img, &Img_Save[1][1][0], 18, 0, 18, 16);
+        Crop_Image(&Img, &Img_Save[1][1][1], 18, 16, 18, 16);
+        Swap_Image(Img_Save[0][1][0].img, 18, 16);
+        Swap_Image(Img_Save[0][1][1].img, 18, 16);
+        Swap_Image(Img_Save[1][1][0].img, 18, 16);
+        Swap_Image(Img_Save[1][1][1].img, 18, 16);
+        Flip_Horizontal(&Img_Save[0][1][0], &Img_Save[0][0][0]);
+        Flip_Horizontal(&Img_Save[0][1][1], &Img_Save[0][0][1]);
+        Flip_Horizontal(&Img_Save[1][1][0], &Img_Save[1][0][0]);
+        Flip_Horizontal(&Img_Save[1][1][1], &Img_Save[1][0][1]);
+        Delete_Image(&Img);
+    }
 };
 Image c_Frog::Img_Save[2][2][2];
-float c_Frog::Map_Offset[2]={-1.0f,1.0f};//
-float c_Frog::Map_Base_Angle[2]={160.0f,20.of};//nhin sang trai goc 160
+//float c_Frog::Map_Offset[2]={-1.0f,1.0f};//
+//float c_Frog::Map_Base_Angle[2]={160.0f,20.0f};//nhin sang trai goc 160
 c_Frog Frogs[2];
 
 //xu ly thay doi cua cua so, khi goi lai thi ve lai hoan toan
