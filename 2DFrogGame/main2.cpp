@@ -114,7 +114,7 @@ class c_Frog {
         Rect Rct;
         Image *Img;
 
-//        float x, y, vx, vy;//van toc
+        float x, y, vx, vy;//van toc
         int Player;
         int Drt, Anim;//dang ngoi hay nhay
         int Prepare_Stt;//trang thai 
