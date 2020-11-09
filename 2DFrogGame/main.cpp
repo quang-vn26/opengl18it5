@@ -146,10 +146,91 @@ class c_Line{
 };
 Image c_Line::Img_Save[2];
 Rect c_Line::Rct;
-
 std::vector<c_Line> Lines;
 // c_Line Line(0,100.0f,100.0f,45.0f);//nguoi choi 0, 2 toa do , goc quay 45 do
 
+class c_Fly {
+public:
+    static Image Img_Save[2];
+    static float ax_Base,ay_Base;
+    static float vx_Max,vy_Max;
+
+    static void Load_Image() {
+        Image Img;
+        Load_Texture(&Img, "Images/Fly.png");
+        Crop_Image(&Img, &Img_Save[0], 0, 0, 10, 6);
+        Crop_Image(&Img, &Img_Save[1], 0, 6, 10, 6);
+        // Crop_Image(&Img, &c_Particle::Img_Save, 0, 12, 4, 4);
+        Swap_Image(Img_Save[0].img,10,6);
+        Swap_Image(Img_Save[1].img,10,6);
+        Zoom_Image(&Img_Save[0],SCALE);
+        Zoom_Image(&Img_Save[1],SCALE);
+
+    }
+    Rect Rct;
+    Image *Img;
+    float x,y,vx,vy,ax,ay,Scale;
+    int Timer,Anim,Region;
+    bool Is_Alive;
+    c_Fly(float _x,float _y,int _Region){
+        x=_x +rand()%41 -20;
+        y = _y + rand()%41-20; 
+        vx = vx_Max;
+        vy = 0.0f;
+        ax = ax_Base;
+        ay = ay_Base;
+        Region = _Region;
+        Timer = 0;
+        Anim = 0;
+        Scale = 0.0f;
+        Is_Alive = false;
+        Img = &Img_Save[0];
+    }
+    void Update_Rect(){
+        Rct.Left = x - Img->w/2*Scale;
+        Rct.Right = Rct.Left +Img->w*Scale;
+        Rct.Bottom = y - Img->h/2*Scale;
+        Rct.Top = Rct.Bottom + Img->h*Scale;
+    }
+    void Draw(){
+        Map_Texture(Img);
+        Draw_Rect(&Rct);
+    }
+    void Update(){
+        if(!Is_Alive){
+            Scale +=0.05f;
+            if(Scale >= 1.0f){
+                Scale = 1.0f;
+                Is_Alive = true;
+            }
+        }
+        x += vx;
+        y += vy;
+        vx += ax;
+        vy += ay;
+
+        if(vx >= vx_Max || vx <= -vx_Max)
+            ax = vx < 0 ? ax_Base:-ax_Base; 
+        if(vy >= vy_Max || vy <= -vy_Max)
+            ay = vy < 0 ? ay_Base:-ay_Base; 
+        Timer++;
+        if(Timer == 6){
+            Timer = 0;
+            Anim = 1-Anim;
+            Img = &Img_Save[Anim];
+        }
+        Update_Rect();
+    }
+    bool Is_Caught(float _x,float _y){
+        if(_x - 20.0f < x && _x + 20.0f > x && _y-6.0f<y &&_y +34.0f >y)
+            return true;
+        return false;
+    }
+};
+Image c_Fly::Img_Save[2];
+float c_Fly::ax_Base = 0.015f,c_Fly::ay_Base = 0.02f; 
+float c_Fly::vx_Max = 0.3f,c_Fly::vy_Max=0.0f;
+std::vector<c_Fly> Flies;
 class c_Frog {
     public:
         static Image Img_Save[2][2][2];// nguoi choi, huong,hanh dong
@@ -291,6 +372,15 @@ class c_Frog {
                     vx = -vx;
                     Update_Image();
                 }
+                std::vector<c_Fly>::iterator it = Flies.begin();
+                while (it != Flies.end()){
+                    if(it->Is_Caught(x,y)){
+                        it = Flies.erase(it);
+                        Score++;
+                    }
+                    else
+                        it++;
+                }
                 Update_Rect();                   
             }
         }
@@ -338,6 +428,54 @@ bool (*c_Frog::Check_Angle[2][2])(float Angle) = {
     {Check_Angle_Right_Decrease,Check_Angle_Right_Increase}
 };
 c_Frog Frogs[2];
+
+
+class c_Point{
+public:
+    float x,y;
+    c_Point(float _x,float _y){
+        x = _x;
+        y = _y;
+    }
+};
+class c_Spawn_Flies{
+public:
+    c_Point Spawn_Points[6] = {
+        c_Point(100.0f,300.0f),
+        c_Point(620.0f,300.0f),
+        c_Point(360.0f,280.0f),
+        c_Point(360.0f,130.0f),
+        c_Point(100.0f,120.0f),
+        c_Point(620.0f,120.0f)
+    }; 
+    int Max_Files,Count_Spawn_Points,Timer;
+    c_Spawn_Flies(int _Max_Files){
+        Max_Files = _Max_Files;
+        Timer  = 60;
+        Count_Spawn_Points = sizeof(Spawn_Points)/sizeof(c_Point);
+    }
+    void Update(){
+        Timer++;
+        if(Timer == 90){
+            Timer=0;
+            if(Flies.size()<Max_Files){
+                bool Check;
+                int Region;
+                do {
+                    Check = false;
+                    Region = rand()%Count_Spawn_Points;
+                    for(c_Fly Fly: Flies)
+                        if(Fly.Region == Region){
+                            Check = true;
+                            break;
+                        }
+                }while(Check);
+                Flies.push_back(c_Fly(Spawn_Points[Region].x,Spawn_Points[Region].y,Region));       
+            }
+        }
+    }
+};
+c_Spawn_Flies Spawn_Flies(2);
 //xu ly thay doi cua cua so, khi goi lai thi ve lai hoan toan
 void Display(){
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -355,6 +493,10 @@ void Display(){
 
     for(int i=0;i<CLOUD_COUNT; i++){
         Clouds[i].Draw();
+    }
+    int Size = Flies.size();
+    for(int i =0;i<Size;i++){
+        Flies[i].Draw();
     }
 
     for(int i =0;i<PLATFORMER_COUNT;i++){
@@ -384,6 +526,7 @@ void Init_Game(){
     c_Cloud::Load_Image();
     c_Frog::Load_Image();
     c_Line::Load_Image();
+    c_Fly::Load_Image();
     //6 cai buc
     Platformers[0].Init(7, 5);
     Platformers[1].Init(19, 5);
@@ -421,7 +564,10 @@ void Timer(int value){
 //    printf("Hello");
     for(int i=0;i<CLOUD_COUNT; i++)
         Clouds[i].Update();
-        
+    Spawn_Flies.Update();
+    int Size = Flies.size();
+    for (int i=0;i<Size;i++)
+        Flies[i].Update(); 
     Lines.clear();
     Frogs[0].Update();
     Frogs[1].Update();
