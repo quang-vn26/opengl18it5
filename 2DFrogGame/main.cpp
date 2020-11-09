@@ -259,7 +259,7 @@ void Display(){
 
 void Init_Game(){
     //load anh va phong to
-    Load_Texture_Swap(&Img_Background,"./Images/Background.png");
+    Load_Texture_Swap(&Img_Background,"./Images/bg3.png");
     Zoom_Image(&Img_Background,SCALE);
     Load_Texture_Swap(&Img_Ground,"./Images/Ground.png");
     Zoom_Image(&Img_Ground,3);
