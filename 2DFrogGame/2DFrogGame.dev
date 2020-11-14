@@ -11,7 +11,7 @@ ResourceIncludes=
 MakeIncludes=
 Compiler=
 CppCompiler=
-Linker=-lopengl32_@@_-lfreeglut_@@_-lglu32_@@_
+Linker="C:/Program Files (x86)/Dev-Cpp/MinGW32/lib/libopengl32.a"_@@_"C:/Program Files (x86)/Dev-Cpp/MinGW32/lib/libglu32.a"_@@_"C:/Program Files (x86)/Dev-Cpp/MinGW32/lib/libglut32.a"_@@_
 IsCpp=1
 Icon=
 ExeOutput=
@@ -28,7 +28,7 @@ Folders=
 IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=0
-CompilerSettings=00000000c0000000001000000
+CompilerSettings=00000001c0000000001000000
 UnitCount=1
 
 [VersionInfo]
