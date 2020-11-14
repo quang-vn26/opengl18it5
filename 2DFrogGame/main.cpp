@@ -1,7 +1,7 @@
 #define MAIN_H
 
-#include "../Library/loadpng.h"
-#include "../Library/process_image.h"
+#include "../lib/loadpng.h"
+#include "../lib/process_image.h"
 
 #include <GL/glut.h>
 
